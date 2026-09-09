@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docs & Panduan - ReyCode Mail API</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between font-sans">
+
+    <!-- Header -->
+    <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="/" class="text-xl font-bold tracking-wider text-cyan-400">REY<span class="text-white">CODE</span>.MAIL</a>
+            <a href="/" class="text-xs text-slate-400 hover:text-white transition flex items-center gap-1">&larr; Kembali ke Beranda</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl w-full mx-auto px-4 py-10 flex-grow space-y-8">
+        
+        <!-- Judul & Info Utama -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-3xl">📚</span>
+                <div>
+                    <h2 class="text-xl font-bold text-white">Dokumentasi & Panduan Penggunaan</h2>
+                    <p class="text-xs text-slate-400">Sistem Layanan Email Sementara (Temp Mail) Custom Domain & Integrasi Bot WhatsApp.</p>
+                </div>
+            </div>
+
+            <!-- Status Live API dari Endpoint -->
+            <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-center justify-between text-xs">
+                <span class="text-slate-400">Status Endpoint <code class="text-cyan-400">/api/docs</code>:</span>
+                <span id="apiStatusBadge" class="px-2.5 py-1 rounded-full bg-amber-950/50 text-amber-400 border border-amber-900/50 font-mono">Memuat...</span>
+            </div>
+        </div>
+
+        <!-- Panduan Cara Pakai -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-3">
+                <div class="text-cyan-400 font-bold text-sm flex items-center gap-2">
+                    <span>⚡</span> 1. Penggunaan di Website Utama
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Buka halaman utama (<code class="text-cyan-300">/</code>). Kamu bisa langsung memakai email random yang otomatis dibuatkan atau mengetik username custom dengan pilihan domain <code class="text-cyan-300">@reycode.my.id</code> & <code class="text-cyan-300">@legionteknologi.my.id</code>. Kotak masuk akan merefresh pesan secara real-time setiap 5 detik.
+                </p>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-3">
+                <div class="text-cyan-400 font-bold text-sm flex items-center gap-2">
+                    <span>🤖</span> 2. Integrasi Bot WhatsApp
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Jika kamu membuat email melalui bot WhatsApp, akun dan pesan masuk akan langsung disinkronkan ke database MongoDB Atlas. Kamu bisa membuka kembali inbox email tersebut melalui halaman <a href="/login.html" class="text-cyan-400 underline">Login Akun</a> kapan saja.
+                </p>
+            </div>
+
+        </div>
+
+        <!-- Daftar Endpoint API -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-4">
+            <h3 class="font-bold text-white text-sm border-b border-slate-800 pb-3">🔌 Daftar Endpoint API Publik</h3>
+            
+            <div class="space-y-3 text-xs">
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
+                    <div class="flex items-center gap-2 font-mono">
+                        <span class="bg-cyan-950 text-cyan-400 px-2 py-0.5 rounded border border-cyan-800 font-bold">GET</span>
+                        <span class="text-white">/api/messages/:email</span>
+                    </div>
+                    <p class="text-slate-400 pl-1">Mengambil seluruh daftar pesan masuk berdasarkan alamat email tertentu.</p>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
+                    <div class="flex items-center gap-2 font-mono">
+                        <span class="bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded border border-emerald-800 font-bold">POST</span>
+                        <span class="text-white">/api/auth/login</span>
+                    </div>
+                    <p class="text-slate-400 pl-1">Autentikasi atau sinkronisasi akun email bot menggunakan parameter <code class="text-cyan-300">email</code> dan <code class="text-cyan-300">password</code>.</p>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
+                    <div class="flex items-center gap-2 font-mono">
+                        <span class="bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded border border-emerald-800 font-bold">POST</span>
+                        <span class="text-white">/api/webhook</span>
+                    </div>
+                    <p class="text-slate-400 pl-1">Endpoint penerima email masuk (Webhook) dari Cloudflare Worker yang diamankan dengan <code class="text-cyan-300">secret</code> token.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Mentah JSON dari Endpoint /api/docs -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-3">
+            <div class="flex justify-between items-center">
+                <span class="text-xs font-semibold text-slate-400">Raw JSON dari <code class="text-cyan-400">/api/docs</code>:</span>
+                <button onclick="copyRawJson()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded-lg transition">Salin JSON</button>
+            </div>
+            <div id="docsContent" class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-cyan-300 overflow-x-auto whitespace-pre-wrap leading-relaxed">
+                Menghubungkan ke endpoint /api/docs...
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-900 py-6 text-center text-xs text-slate-600">
+        Powered by ReyCloudSHP &bull; Custom Cloudflare MX & Vercel Serverless
+    </footer>
+
+    <!-- Script Fetch API Docs -->
+    <script>
+        let rawJsonData = '';
+
+        async function fetchDocsEndpoint() {
+            try {
+                const res = await axios.get('/api/docs');
+                rawJsonData = JSON.stringify(res.data, null, 2);
+                document.getElementById('docsContent').innerText = rawJsonData;
+                
+                const badge = document.getElementById('apiStatusBadge');
+                badge.innerText = 'Connected (Online)';
+                badge.className = 'px-2.5 py-1 rounded-full bg-emerald-950/50 text-emerald-400 border border-emerald-900/50 font-mono';
+            } catch (err) {
+                document.getElementById('docsContent').innerText = 'Gagal mengambil data dari endpoint /api/docs';
+                const badge = document.getElementById('apiStatusBadge');
+                badge.innerText = 'Offline / Error';
+                badge.className = 'px-2.5 py-1 rounded-full bg-red-950/50 text-red-400 border border-red-900/50 font-mono';
+            }
+        }
+
+        function copyRawJson() {
+            if (!rawJsonData) return;
+            navigator.clipboard.writeText(rawJsonData);
+            alert('Raw JSON berhasil disalin!');
+        }
+
+        fetchDocsEndpoint();
+    </script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReyCode Temp Mail</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between font-sans">
+
+    <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center relative">
+            <h1 class="text-xl font-bold tracking-wider text-cyan-400">REY<span class="text-white">CODE</span>.MAIL</h1>
+            
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <button onclick="toggleMenu()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 p-2.5 rounded-xl text-cyan-400 transition flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+
+                    <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl py-2 z-50">
+                        <a href="/login" class="block px-4 py-2.5 text-xs text-slate-200 hover:bg-slate-800 transition">🔑 Login Akun Bot</a>
+                        <a href="/docs" class="block px-4 py-2.5 text-xs text-slate-200 hover:bg-slate-800 transition border-t border-slate-800/60">📚 Docs / Panduan</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl w-full mx-auto px-4 py-8 flex-grow space-y-6">
+        
+        <div class="flex gap-2">
+            <button onclick="switchMode('random')" id="btnRandom" class="px-4 py-2 text-xs font-semibold rounded-xl bg-cyan-600 text-slate-950 transition">⚡ Auto Random</button>
+            <button onclick="switchMode('custom')" id="btnCustom" class="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-900 text-slate-400 border border-slate-800 transition">✍️ Costum Email</button>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+            <label class="block text-sm font-medium text-slate-400 mb-2">Email Sementara Anda:</label>
+            
+            <div id="modeRandom" class="flex flex-col sm:flex-row gap-3">
+                <div class="flex flex-grow bg-slate-950 border border-slate-800 rounded-xl overflow-hidden">
+                    <input type="text" id="emailBox" readonly class="bg-transparent px-4 py-3 w-full text-cyan-300 font-mono outline-none text-sm sm:text-base" value="Memuat email...">
+                    <button onclick="copyCurrentEmail()" class="bg-slate-800 hover:bg-slate-700 px-4 text-xs font-semibold text-slate-300 transition border-l border-slate-800">Salin</button>
+                </div>
+                <button onclick="generateNewEmail()" class="bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold px-6 py-3 rounded-xl transition shadow-lg text-sm">
+                    Ganti / Acak
+                </button>
+            </div>
+
+            <div id="modeCustom" class="hidden flex flex-col gap-3">
+                <div class="flex flex-grow bg-slate-950 border border-slate-800 rounded-xl overflow-hidden items-center">
+                    <input type="text" id="customUsername" placeholder="ketik_nama_bebas" class="bg-transparent px-4 py-3 w-full text-cyan-300 font-mono outline-none text-sm">
+                    <span class="text-slate-600 px-2">@</span>
+                    <div id="selectedDomainText" class="px-4 py-3 bg-slate-900 text-cyan-400 font-mono text-xs border-l border-slate-800 whitespace-nowrap">reycode.my.id</div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-slate-400">Pilih Domain:</span>
+                    <button type="button" onclick="setDomain('reycode.my.id')" id="btnDom1" class="px-3 py-1.5 text-xs font-mono rounded-lg bg-cyan-600 text-slate-950 font-bold transition">reycode.my.id</button>
+                    <button type="button" onclick="setDomain('legionteknologi.my.id')" id="btnDom2" class="px-3 py-1.5 text-xs font-mono rounded-lg bg-slate-800 text-slate-300 transition">legionteknologi.my.id</button>
+                </div>
+                <button onclick="useCustomEmail()" class="bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold px-6 py-3 rounded-xl transition text-sm mt-1">
+                    Gunakan Email Custom
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-800">
+                <h2 class="text-lg font-semibold flex items-center gap-2">
+                    <span>Kotak Masuk Real-Time</span>
+                    <span id="msgCount" class="bg-slate-800 text-cyan-400 text-xs px-2.5 py-0.5 rounded-full font-mono">0</span>
+                </h2>
+                <button onclick="fetchMessages()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition">🔄 Refresh</button>
+            </div>
+            <div id="inboxList" class="space-y-4">
+                <div class="text-center py-12 text-slate-500 text-sm">Kotak masuk masih kosong. Menunggu email verifikasi...</div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="border-t border-slate-900 py-6 text-center text-xs text-slate-600">
+        Powered by ReyCloudSHP &bull; Custom Cloudflare MX & Vercel Serverless
+    </footer>
+
+    <script>
+        const DOMAINS = ['reycode.my.id', 'legionteknologi.my.id'];
+        let currentEmail = '';
+        let chosenDomain = 'reycode.my.id';
+        let inboxInterval = null;
+
+        function showToast(message, type = 'success') {
+            const oldToast = document.getElementById('customToast');
+            if (oldToast) oldToast.remove();
+            const toast = document.createElement('div');
+            toast.id = 'customToast';
+            toast.className = `fixed top-5 right-5 z-50 px-4 py-3 rounded-xl shadow-2xl border text-xs sm:text-sm font-medium transition-all duration-300 transform translate-y-[-20px] opacity-0 flex items-center gap-2 ${
+                type === 'success' ? 'bg-slate-900 border-cyan-800 text-cyan-300' : 'bg-slate-900 border-red-800 text-red-400'
+            }`;
+            toast.innerHTML = `<span>${type === 'success' ? '✅' : '⚠️'}</span> <span>${message}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-y-[-20px]', 'opacity-0'), 10);
+            setTimeout(() => {
+                toast.classList.add('translate-y-[-20px]', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleMenu() {
+            const menu = document.getElementById('dropdownMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        window.addEventListener('click', function(e) {
+            const menu = document.getElementById('dropdownMenu');
+            const btn = e.target.closest('button');
+            if (!btn && !menu.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+
+        // Cek parameter URL jika dialihkan dari halaman login
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramEmail = urlParams.get('email');
+            if (paramEmail) {
+                currentEmail = paramEmail;
+                document.getElementById('emailBox').value = currentEmail;
+                showToast(`Memuat inbox: ${currentEmail}`, 'success');
+                fetchMessages();
+            } else {
+                generateNewEmail();
+            }
+        });
+
+        function switchMode(mode) {
+            const rEl = document.getElementById('modeRandom');
+            const cEl = document.getElementById('modeCustom');
+            const btnR = document.getElementById('btnRandom');
+            const btnC = document.getElementById('btnCustom');
+
+            if (mode === 'random') {
+                rEl.classList.remove('hidden');
+                cEl.classList.add('hidden');
+                btnR.className = "px-4 py-2 text-xs font-semibold rounded-xl bg-cyan-600 text-slate-950 transition";
+                btnC.className = "px-4 py-2 text-xs font-semibold rounded-xl bg-slate-900 text-slate-400 border border-slate-800 transition";
+                generateNewEmail();
+            } else {
+                rEl.classList.add('hidden');
+                cEl.classList.remove('hidden');
+                btnC.className = "px-4 py-2 text-xs font-semibold rounded-xl bg-cyan-600 text-slate-950 transition";
+                btnR.className = "px-4 py-2 text-xs font-semibold rounded-xl bg-slate-900 text-slate-400 border border-slate-800 transition";
+            }
+        }
+
+        function setDomain(domain) {
+            chosenDomain = domain;
+            document.getElementById('selectedDomainText').innerText = domain;
+            const btn1 = document.getElementById('btnDom1');
+            const btn2 = document.getElementById('btnDom2');
+            if (domain === 'reycode.my.id') {
+                btn1.className = "px-3 py-1.5 text-xs font-mono rounded-lg bg-cyan-600 text-slate-950 font-bold transition";
+                btn2.className = "px-3 py-1.5 text-xs font-mono rounded-lg bg-slate-800 text-slate-300 transition";
+            } else {
+                btn2.className = "px-3 py-1.5 text-xs font-mono rounded-lg bg-cyan-600 text-slate-950 font-bold transition";
+                btn1.className = "px-3 py-1.5 text-xs font-mono rounded-lg bg-slate-800 text-slate-300 transition";
+            }
+        }
+
+        function randomString(length) {
+            const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function generateNewEmail() {
+            const domain = DOMAINS[Math.floor(Math.random() * DOMAINS.length)];
+            const username = 'rch' + randomString(8);
+            currentEmail = `${username}@${domain}`;
+            document.getElementById('emailBox').value = currentEmail;
+            fetchMessages();
+        }
+
+        function useCustomEmail() {
+            const username = document.getElementById('customUsername').value.trim().toLowerCase();
+            if (!username) {
+                showToast('Masukkan username terlebih dahulu!', 'error');
+                return;
+            }
+            currentEmail = `${username}@${chosenDomain}`;
+            document.getElementById('emailBox').value = currentEmail;
+            showToast(`Email diatur ke: ${currentEmail}`, 'success');
+            fetchMessages();
+        }
+
+        function copyCurrentEmail() {
+            const box = document.getElementById('emailBox');
+            navigator.clipboard.writeText(box.value);
+            showToast(`Berhasil disalin: ${box.value}`, 'success');
+        }
+
+        async function fetchMessages() {
+            if (!currentEmail) return;
+            try {
+                const res = await axios.get(`/api/messages/${currentEmail}`);
+                const messages = res.data.messages || [];
+                document.getElementById('msgCount').innerText = messages.length;
+                const inboxList = document.getElementById('inboxList');
+
+                if (messages.length === 0) {
+                    inboxList.innerHTML = `<div class="text-center py-12 text-slate-500 text-sm">Kotak masuk masih kosong. Menunggu email verifikasi...</div>`;
+                    return;
+                }
+
+                inboxList.innerHTML = messages.map(msg => `
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 transition hover:border-cyan-800">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-semibold text-cyan-400">Dari: ${msg.from}</span>
+                            <span class="text-xs text-slate-500">${new Date(msg.createdAt).toLocaleTimeString()}</span>
+                        </div>
+                        <h3 class="font-bold text-sm text-white mb-2">${msg.subject}</h3>
+                        <div class="bg-slate-900 p-3 rounded-lg text-xs font-mono text-slate-300 overflow-x-auto whitespace-pre-wrap border border-slate-800">${msg.text || msg.html}</div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error('Gagal mengambil pesan:', err);
+            }
+        }
+
+        if (inboxInterval) clearInterval(inboxInterval);
+        inboxInterval = setInterval(fetchMessages, 5000);
+    </script>
+</body>
+</html>
