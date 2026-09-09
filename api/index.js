@@ -3,10 +3,10 @@ const mongoose = require('mongoose');
 const path = require('path');
 
 const app = express();
-app.use(express.json({ limit: '10mb' })); // Batas payload besar untuk email bergambar/lampiran teks
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-const MONGO_URI = process.env.MONGO_URI || 'ISI_MONGO_URI_KAMU_DISINI';
+const MONGO_URI = process.env.MONGO_URI || '';
 let isConnected = false;
 
 async function connectDB() {
@@ -14,7 +14,7 @@ async function connectDB() {
   try {
     await mongoose.connect(MONGO_URI);
     isConnected = true;
-    console.log('MongoDB Connected');
+    console.log('MongoDB Connected Successfully');
   } catch (err) {
     console.error('MongoDB Connection Error:', err);
   }
@@ -37,13 +37,12 @@ const emailSchema = new mongoose.Schema({
 });
 const EmailMessage = mongoose.models.EmailMessage || mongoose.model('EmailMessage', emailSchema);
 
-// ⭐ ENDPOINT WEBHOOK UTAMA (Nangkap data dari Cloudflare Worker dengan aman)
+// 1. Endpoint Webhook untuk Cloudflare Worker
 app.post('/api/webhook', async (req, res) => {
   await connectDB();
   try {
     const { secret, to, from, subject, text, html } = req.body;
     
-    // Validasi Secret Token
     const validSecret = process.env.WEBHOOK_SECRET || 'reycode123';
     if (secret !== validSecret) {
       return res.status(403).json({ error: 'Unauthorized: Invalid secret token' });
@@ -53,14 +52,12 @@ app.post('/api/webhook', async (req, res) => {
       return res.status(400).json({ error: 'Recipient (to) is required' });
     }
 
-    // Bersihkan dan pastikan data tidak ada yang missing
     const cleanTo = String(to).trim().toLowerCase();
     const cleanFrom = String(from || 'No Sender').trim();
     const cleanSubject = String(subject || 'No Subject').trim();
-    const cleanText = String(text || '[Tidak ada teks atau format body tidak terbaca]').trim();
+    const cleanText = String(text || '[Tidak ada teks]').trim();
     const cleanHtml = String(html || cleanText).trim();
 
-    // Simpan ke MongoDB Atlas
     await EmailMessage.create({
       to: cleanTo,
       from: cleanFrom,
@@ -69,42 +66,50 @@ app.post('/api/webhook', async (req, res) => {
       html: cleanHtml
     });
     
-    return res.status(200).json({ success: true, message: 'Email successfully captured and saved!' });
+    return res.status(200).json({ success: true, message: 'Email saved successfully!' });
   } catch (err) {
-    console.error('Webhook Capture Error:', err);
+    console.error('Webhook Error:', err);
     return res.status(500).json({ error: err.message });
   }
 });
 
-// Endpoint Login Akun Bot
+// 2. Endpoint Login Akun Privat / Bot
 app.post('/api/auth/login', async (req, res) => {
   await connectDB();
   try {
-    const { email, password } = req.body;
-    if (!email) return res.status(400).json({ error: 'Email wajib diisi!' });
+    let { email, password } = req.body;
+    if (!email || typeof email !== 'string' || email.trim() === '') {
+      return res.status(400).json({ error: 'Email wajib diisi!' });
+    }
 
-    const cleanEmail = email.toLowerCase();
-    const account = await Account.findOne({ email: cleanEmail });
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPassword = password ? password.trim() : '';
+
+    let account = await Account.findOne({ email: cleanEmail });
     
     if (!account) {
       if (cleanEmail.endsWith('@reycode.my.id') || cleanEmail.endsWith('@legionteknologi.my.id')) {
-        const newAcc = await Account.create({ email: cleanEmail, password: password || 'reycode123' });
-        return res.status(200).json({ success: true, email: newAcc.email });
+        account = await Account.create({ 
+          email: cleanEmail, 
+          password: cleanPassword || 'reycode123' 
+        });
+      } else {
+        return res.status(400).json({ error: 'Email tidak terdaftar di sistem domain kami!' });
       }
-      return res.status(400).json({ error: 'Email tidak ditemukan di sistem!' });
-    }
-
-    if (account.password && password && account.password !== password) {
-      return res.status(400).json({ error: 'Password salah!' });
+    } else {
+      if (account.password && cleanPassword && account.password !== cleanPassword) {
+        return res.status(400).json({ error: 'Password salah!' });
+      }
     }
 
     return res.status(200).json({ success: true, email: account.email });
   } catch (err) {
+    console.error('Login Error:', err);
     return res.status(500).json({ error: err.message });
   }
 });
 
-// Endpoint Cek Inbox Real-Time
+// 3. Endpoint Ambil Pesan Inbox Berdasarkan Email
 app.get('/api/messages/:email', async (req, res) => {
   await connectDB();
   try {
@@ -112,15 +117,16 @@ app.get('/api/messages/:email', async (req, res) => {
     const messages = await EmailMessage.find({ to: email }).sort({ createdAt: -1 });
     return res.status(200).json({ success: true, messages });
   } catch (err) {
+    console.error('Fetch Messages Error:', err);
     return res.status(500).json({ error: err.message });
   }
 });
 
-// Endpoint Dokumentasi API
+// 4. Endpoint Dokumentasi API
 app.get('/api/docs', (req, res) => {
   res.json({
     project: "ReyCode Temp Mail & Custom Domain API",
-    version: "2.1.0",
+    version: "2.3.0",
     domains: ["reycode.my.id", "legionteknologi.my.id"],
     endpoints: {
       checkInbox: "GET /api/messages/:email",
@@ -130,7 +136,16 @@ app.get('/api/docs', (req, res) => {
   });
 });
 
-// Load file HTML dari root folder langsung
+// Routing Halaman HTML Statis untuk Vercel Serverless
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, '../login.html'));
+});
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../index.html'));
+});
+
+// Fallback static files
 app.use(express.static(path.join(__dirname, '../')));
 
 const PORT = process.env.PORT || 3000;
