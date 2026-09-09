@@ -44,7 +44,7 @@ app.post('/api/webhook', async (req, res) => {
     const { secret, to, from, subject, text, html } = req.body;
     
     // Validasi Secret Token
-    const validSecret = process.env.WEBHOOK_SECRET || 'reycode_secret_123';
+    const validSecret = process.env.WEBHOOK_SECRET || 'reycode123';
     if (secret !== validSecret) {
       return res.status(403).json({ error: 'Unauthorized: Invalid secret token' });
     }

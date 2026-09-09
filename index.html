@@ -73,7 +73,8 @@
                     <span>Kotak Masuk Real-Time</span>
                     <span id="msgCount" class="bg-slate-800 text-cyan-400 text-xs px-2.5 py-0.5 rounded-full font-mono">0</span>
                 </h2>
-                <button onclick="fetchMessages()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition">🔄 Refresh</button>
+                <!-- Tombol Refresh diperbaiki dengan memanggil fungsi fetchMessages() secara langsung -->
+                <button onclick="fetchMessages()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition cursor-pointer">🔄 Refresh</button>
             </div>
             <div id="inboxList" class="space-y-4">
                 <div class="text-center py-12 text-slate-500 text-sm">Kotak masuk masih kosong. Menunggu email verifikasi...</div>
@@ -122,7 +123,6 @@
             }
         });
 
-        // Cek parameter URL jika dialihkan dari halaman login
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const paramEmail = urlParams.get('email');
@@ -206,7 +206,15 @@
         }
 
         async function fetchMessages() {
-            if (!currentEmail) return;
+            if (!currentEmail) {
+                // Ambil ulang dari input jika variabel currentEmail kosong
+                const boxVal = document.getElementById('emailBox').value;
+                if (boxVal && boxVal !== 'Memuat email...') {
+                    currentEmail = boxVal;
+                } else {
+                    return;
+                }
+            }
             try {
                 const res = await axios.get(`/api/messages/${currentEmail}`);
                 const messages = res.data.messages || [];
@@ -228,8 +236,10 @@
                         <div class="bg-slate-900 p-3 rounded-lg text-xs font-mono text-slate-300 overflow-x-auto whitespace-pre-wrap border border-slate-800">${msg.text || msg.html}</div>
                     </div>
                 `).join('');
+                showToast('Kotak masuk diperbarui!', 'success');
             } catch (err) {
                 console.error('Gagal mengambil pesan:', err);
+                showToast('Gagal memuat pesan dari server', 'error');
             }
         }
 
