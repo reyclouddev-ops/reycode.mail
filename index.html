@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ReyCode Temp Mail</title>
+    <title>ReyCode Mail - Temp Mail Service</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
@@ -16,15 +16,21 @@
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between font-sans">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between font-sans selection:bg-cyan-500 selection:text-slate-950">
 
     <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
         <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center relative">
-            <h1 class="text-xl font-bold tracking-wider text-cyan-400">REY<span class="text-white">CODE</span>.MAIL</h1>
+            <div class="flex items-center gap-2">
+                <h1 class="text-xl font-bold tracking-wider text-cyan-400">REY<span class="text-white">CODE</span>.MAIL</h1>
+                <span class="flex h-2 w-2 relative">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                </span>
+            </div>
             
             <div class="flex items-center gap-3">
                 <div class="relative">
-                    <button onclick="toggleMenu()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 p-2.5 rounded-xl text-cyan-400 transition flex items-center justify-center cursor-pointer">
+                    <button onclick="toggleMenu()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 p-2.5 rounded-xl text-cyan-400 transition flex items-center justify-center cursor-pointer shadow-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
@@ -42,35 +48,36 @@
     <main class="max-w-4xl w-full mx-auto px-4 py-8 flex-grow space-y-6">
         
         <div class="flex gap-2">
-            <button onclick="switchMode('random')" id="btnRandom" class="px-4 py-2 text-xs font-semibold rounded-xl bg-cyan-600 text-slate-950 transition cursor-pointer">⚡ Auto Random</button>
+            <button onclick="switchMode('random')" id="btnRandom" class="px-4 py-2 text-xs font-semibold rounded-xl bg-cyan-600 text-slate-950 transition cursor-pointer shadow-lg shadow-cyan-950/50">⚡ Auto Random</button>
             <button onclick="switchMode('custom')" id="btnCustom" class="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-900 text-slate-400 border border-slate-800 transition cursor-pointer">✍️ Costum Email</button>
         </div>
 
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none"></div>
             <label class="block text-sm font-medium text-slate-400 mb-2">Email Sementara Anda:</label>
             
             <div id="modeRandom" class="flex flex-col sm:flex-row gap-3">
-                <div class="flex flex-grow bg-slate-950 border border-slate-800 rounded-xl overflow-hidden">
-                    <input type="text" id="emailBox" readonly class="bg-transparent px-4 py-3 w-full text-cyan-300 font-mono outline-none text-sm sm:text-base" value="Memuat email...">
-                    <button onclick="copyCurrentEmail()" class="bg-slate-800 hover:bg-slate-700 px-4 text-xs font-semibold text-slate-300 transition border-l border-slate-800 cursor-pointer">Salin</button>
+                <div class="flex flex-grow bg-slate-950 border border-slate-800 rounded-xl overflow-hidden shadow-inner">
+                    <input type="text" id="emailBox" readonly class="bg-transparent px-4 py-3 w-full text-cyan-300 font-mono outline-none text-sm sm:text-base select-all" value="Memuat email...">
+                    <button onclick="copyCurrentEmail()" class="bg-slate-800 hover:bg-slate-700 active:bg-cyan-600 active:text-slate-950 px-5 text-xs font-semibold text-slate-300 transition border-l border-slate-800 cursor-pointer flex items-center gap-1">📋 Salin</button>
                 </div>
-                <button onclick="generateNewEmail()" class="bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold px-6 py-3 rounded-xl transition shadow-lg text-sm cursor-pointer">
+                <button onclick="generateNewEmail()" class="bg-cyan-600 hover:bg-cyan-500 active:scale-95 text-slate-950 font-bold px-6 py-3 rounded-xl transition shadow-lg text-sm cursor-pointer whitespace-nowrap">
                     Ganti / Acak
                 </button>
             </div>
 
             <div id="modeCustom" class="hidden flex flex-col gap-3">
-                <div class="flex flex-grow bg-slate-950 border border-slate-800 rounded-xl overflow-hidden items-center">
+                <div class="flex flex-grow bg-slate-950 border border-slate-800 rounded-xl overflow-hidden items-center shadow-inner">
                     <input type="text" id="customUsername" placeholder="ketik_nama_bebas" class="bg-transparent px-4 py-3 w-full text-cyan-300 font-mono outline-none text-sm">
-                    <span class="text-slate-600 px-2">@</span>
+                    <span class="text-slate-600 px-2 font-mono">@</span>
                     <div id="selectedDomainText" class="px-4 py-3 bg-slate-900 text-cyan-400 font-mono text-xs border-l border-slate-800 whitespace-nowrap">reycode.my.id</div>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex flex-wrap items-center gap-2">
                     <span class="text-xs text-slate-400">Pilih Domain:</span>
                     <button type="button" onclick="setDomain('reycode.my.id')" id="btnDom1" class="px-3 py-1.5 text-xs font-mono rounded-lg bg-cyan-600 text-slate-950 font-bold transition cursor-pointer">reycode.my.id</button>
                     <button type="button" onclick="setDomain('legionteknologi.my.id')" id="btnDom2" class="px-3 py-1.5 text-xs font-mono rounded-lg bg-slate-800 text-slate-300 transition cursor-pointer">legionteknologi.my.id</button>
                 </div>
-                <button onclick="useCustomEmail()" class="bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold px-6 py-3 rounded-xl transition text-sm mt-1 cursor-pointer">
+                <button onclick="useCustomEmail()" class="bg-cyan-600 hover:bg-cyan-500 active:scale-95 text-slate-950 font-bold px-6 py-3 rounded-xl transition text-sm mt-1 cursor-pointer shadow-lg">
                     Gunakan Email Custom
                 </button>
             </div>
@@ -80,22 +87,39 @@
             <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-800">
                 <h2 class="text-lg font-semibold flex items-center gap-2">
                     <span>Kotak Masuk Real-Time</span>
-                    <span id="msgCount" class="bg-slate-800 text-cyan-400 text-xs px-2.5 py-0.5 rounded-full font-mono">0</span>
+                    <span id="msgCount" class="bg-slate-800 text-cyan-400 text-xs px-2.5 py-0.5 rounded-full font-mono border border-slate-700">0</span>
                 </h2>
                 <button id="refreshBtn" onclick="fetchMessages(true)" class="text-xs bg-slate-800 hover:bg-slate-700 active:bg-cyan-600 active:text-slate-950 text-slate-300 px-3.5 py-2 rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow-sm">
                     <span id="refreshIcon" class="inline-block">🔄</span> 
                     <span id="refreshText">Refresh</span>
                 </button>
             </div>
-            <div id="inboxList" class="space-y-4">
+            <div id="inboxList" class="space-y-3">
                 <div class="text-center py-12 text-slate-500 text-sm">Kotak masuk masih kosong. Menunggu email verifikasi...</div>
             </div>
         </div>
 
     </main>
 
+    <!-- MODAL BACA EMAIL DETAIL -->
+    <div id="emailModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/40">
+                <h3 id="modalSubject" class="font-bold text-base text-cyan-300 truncate pr-4">Subjek Email</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white bg-slate-800 p-1.5 rounded-lg text-xs cursor-pointer">✕ Tutup</button>
+            </div>
+            <div class="px-6 py-3 border-b border-slate-800/60 bg-slate-900/50 flex flex-col sm:flex-row justify-between text-xs text-slate-400 gap-1">
+                <span id="modalSender">Dari: -</span>
+                <span id="modalTime">Waktu: -</span>
+            </div>
+            <div class="p-6 overflow-y-auto flex-grow bg-slate-950/50">
+                <div id="modalBody" class="text-xs sm:text-sm font-mono text-slate-200 whitespace-pre-wrap leading-relaxed"></div>
+            </div>
+        </div>
+    </div>
+
     <footer class="border-t border-slate-900 py-6 text-center text-xs text-slate-600">
-        Powered by ReyCloudSHP &bull; Custom Cloudflare MX & Vercel Serverless
+        Powered by ReyCloudSHP &bull; Custom Cloudflare MX & Workers API
     </footer>
 
     <script>
@@ -103,6 +127,7 @@
         let currentEmail = '';
         let chosenDomain = 'reycode.my.id';
         let inboxInterval = null;
+        let cachedMessages = [];
 
         function showToast(message, type = 'success') {
             const oldToast = document.getElementById('customToast');
@@ -156,13 +181,13 @@
             if (mode === 'random') {
                 rEl.classList.remove('hidden');
                 cEl.classList.add('hidden');
-                btnR.className = "px-4 py-2 text-xs font-semibold rounded-xl bg-cyan-600 text-slate-950 transition cursor-pointer";
+                btnR.className = "px-4 py-2 text-xs font-semibold rounded-xl bg-cyan-600 text-slate-950 transition cursor-pointer shadow-lg shadow-cyan-950/50";
                 btnC.className = "px-4 py-2 text-xs font-semibold rounded-xl bg-slate-900 text-slate-400 border border-slate-800 transition cursor-pointer";
                 generateNewEmail();
             } else {
                 rEl.classList.add('hidden');
                 cEl.classList.remove('hidden');
-                btnC.className = "px-4 py-2 text-xs font-semibold rounded-xl bg-cyan-600 text-slate-950 transition cursor-pointer";
+                btnC.className = "px-4 py-2 text-xs font-semibold rounded-xl bg-cyan-600 text-slate-950 transition cursor-pointer shadow-lg shadow-cyan-950/50";
                 btnR.className = "px-4 py-2 text-xs font-semibold rounded-xl bg-slate-900 text-slate-400 border border-slate-800 transition cursor-pointer";
             }
         }
@@ -235,22 +260,23 @@
             }
 
             try {
-                const res = await axios.get(`/api/messages/${currentEmail}`);
-                const messages = res.data.messages || [];
-                document.getElementById('msgCount').innerText = messages.length;
+                // DISESUAIKAN DENGAN ENDPOINT WORKER KITA: /api/messages?email=...
+                const res = await axios.get(`/api/messages?email=${encodeURIComponent(currentEmail)}`);
+                cachedMessages = res.data.messages || [];
+                document.getElementById('msgCount').innerText = cachedMessages.length;
                 const inboxList = document.getElementById('inboxList');
 
-                if (messages.length === 0) {
+                if (cachedMessages.length === 0) {
                     inboxList.innerHTML = `<div class="text-center py-12 text-slate-500 text-sm">Kotak masuk masih kosong. Menunggu email verifikasi...</div>`;
                 } else {
-                    inboxList.innerHTML = messages.map(msg => `
-                        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 transition hover:border-cyan-800">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="text-xs font-semibold text-cyan-400">Dari: ${msg.from}</span>
-                                <span class="text-xs text-slate-500">${new Date(msg.createdAt).toLocaleTimeString()}</span>
+                    inboxList.innerHTML = cachedMessages.map((msg, index) => `
+                        <div onclick="openEmailModal(${index})" class="bg-slate-950 border border-slate-800 rounded-xl p-4 transition hover:border-cyan-600 cursor-pointer shadow-sm flex flex-col gap-1.5 group">
+                            <div class="flex justify-between items-start">
+                                <span class="text-xs font-semibold text-cyan-400 truncate max-w-[70%]">Dari: ${msg.sender || 'Unknown'}</span>
+                                <span class="text-xs text-slate-500">${new Date(msg.timestamp || Date.now()).toLocaleTimeString()}</span>
                             </div>
-                            <h3 class="font-bold text-sm text-white mb-2">${msg.subject}</h3>
-                            <div class="bg-slate-900 p-3 rounded-lg text-xs font-mono text-slate-300 overflow-x-auto whitespace-pre-wrap border border-slate-800">${msg.text || msg.html}</div>
+                            <h3 class="font-bold text-sm text-white group-hover:text-cyan-300 transition">${msg.subject || 'Tanpa Subjek'}</h3>
+                            <p class="text-xs text-slate-400 truncate">${msg.body ? msg.body.substring(0, 90) + '...' : 'Klik untuk membaca pesan...'}</p>
                         </div>
                     `).join('');
                 }
@@ -268,9 +294,25 @@
                     setTimeout(() => {
                         refreshIcon.classList.remove('animate-spin-custom');
                         refreshText.innerText = 'Refresh';
-                    }, 400); // jeda sedikit agar animasi putar terlihat jelas
+                    }, 400);
                 }
             }
+        }
+
+        function openEmailModal(index) {
+            const msg = cachedMessages[index];
+            if (!msg) return;
+
+            document.getElementById('modalSubject').innerText = msg.subject || 'Tanpa Subjek';
+            document.getElementById('modalSender').innerText = `Dari: ${msg.sender || '-'}`;
+            document.getElementById('modalTime').innerText = `Waktu: ${new Date(msg.timestamp || Date.now()).toLocaleString()}`;
+            document.getElementById('modalBody').innerText = msg.body || 'Tidak ada isi pesan.';
+            
+            document.getElementById('emailModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('emailModal').classList.add('hidden');
         }
 
         if (inboxInterval) clearInterval(inboxInterval);
